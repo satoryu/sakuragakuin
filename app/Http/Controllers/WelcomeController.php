@@ -12,10 +12,17 @@ class WelcomeController extends Controller
 {
     public function index()
     {
-        $students = Student::selectRaw('name, year2010.rank AS rank2010, year2011.rank AS rank2011, year2012.rank AS rank2012');
+        // $students = Student::selectRaw('name, year2010.rank AS rank2010, year2011.rank AS rank2011, year2012.rank AS rank2012');
+        $fields = array('name');
 
         $years = array(2010, 2011, 2012);
+        foreach($years as $year) {
+            $fields[] = "year{$year}.rank AS rank{$year}";
+        }
 
+        $students = Student::select($fields);
+
+        // Creating sub queries to be joined.
         foreach ($years as $year) {
             $sub_query = $this->getScoreRanking($year);
             $students->leftJoin(
